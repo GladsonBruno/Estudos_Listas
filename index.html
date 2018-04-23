@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Teste Filas</title>
+
+	<script src="https://www.gstatic.com/firebasejs/4.12.1/firebase.js"></script>
+	<script>
+	  // Initialize Firebase
+	  var config = {
+	    apiKey: "AIzaSyA3okSt79NEJ6bjA9_8K958u1I90rXaJmE",
+	    authDomain: "mastertickets-4df61.firebaseapp.com",
+	    databaseURL: "https://mastertickets-4df61.firebaseio.com",
+	    projectId: "mastertickets-4df61",
+	    storageBucket: "mastertickets-4df61.appspot.com",
+	    messagingSenderId: "613727395354"
+	  };
+	  firebase.initializeApp(config);
+	</script>
+</head>
+<body>
+	<button onclick="GerarSenha(1)">Gerar Senha tipo 1</button><br/>
+	<button onclick="GerarSenha(2)">Gerar Senha tipo 2</button><br/>
+	<button onclick="GerarSenha(3)">Gerar Senha tipo 3</button><br/>
+	<button onclick="GerarSenha(4)">Gerar Senha tipo 4</button><br/>
+
+
+	<script src="index.js"></script>
+	<script>
+
+		
+
+		function GerarSenha(tipo){
+			var senha = new Queue();
+
+			var obj = {
+				"Criacao": "",
+				"Identificador": "",
+				"Status": "Em Fila",
+				"Valor": ""
+			}
+
+			switch(tipo){
+				case 1: obj.Identificador = "PFF";
+						obj.Valor = "R$10.00";
+						break;
+				case 2: obj.Identificador = "BFF";
+						obj.Valor = "R$5.00";
+						break;
+				case 3: obj.Identificador = "CFF";
+						obj.Valor = "Gratuito";
+						break;
+				case 4: obj.Identificador = "AFF";
+						obj.Valor = "Gratuito";
+						break;
+			};
+
+			var IdentificadorGenerico = obj.Identificador;
+			var indiceSenha;
+
+			firebase.database().ref("Contador/" + IdentificadorGenerico).once('value').then(function(snapshot){
+				indiceSenha = snapshot.val();
+				firebase.database().ref('Contador/' + IdentificadorGenerico).set(indiceSenha + 1);
+				obj.Identificador = IdentificadorGenerico + (indiceSenha + 1);
+
+				
+
+				senha.Inserir(obj);
+				var SenhaGerada = senha.LerPrimeiro();
+
+				alert(`
+				Senha Gerada \n
+				Senha: `+ obj.Identificador +`\n
+				Valor: ` + obj.Valor + ``);
+			});
+
+			
+
+		}
+		
+		function AtenderSenha(){
+			var senha = new Queue();
+
+			firebase.database().ref("Senhas").once('value').then(function(snapshot){
+
+				snapshot.forEach(function(value){
+					senha.InserirNaLista(value.val());
+				});
+
+				var atendendo = senha.AtenderSenha();
+
+				alert(`
+				Atendendo \n
+				Senha: `+ atendendo.Identificador +`\n
+				Valor: ` + atendendo.Valor + ``);
+			});
+			
+		}
+
+		function FinalizarAtendimento(){
+			var senha = new Queue();
+
+			firebase.database().ref("Atendendo").once('value').then(function(snapshot){
+
+				snapshot.forEach(function(value){
+					senha.InserirNaLista(value.val());
+				});
+
+				senha.FinalizarAtendimento();
+
+			});
+		}
+	</script>
+</body>
+</html>
