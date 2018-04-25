@@ -81,33 +81,79 @@
 			var senha = new Queue();
 
 			firebase.database().ref("Senhas").once('value').then(function(snapshot){
-
+				var atendendo;
 				snapshot.forEach(function(value){
-					senha.InserirNaLista(value.val());
+					if(value.val().Status == "Em Fila"){
+						if(value.val() != null){
+							senha.InserirNaLista(value.val());
+						}
+					}
 				});
-
-				var atendendo = senha.AtenderSenha();
-
-				alert(`
-				Atendendo \n
-				Senha: `+ atendendo.Identificador +`\n
-				Valor: ` + atendendo.Valor + ``);
+				
+				atendendo = senha.AtenderSenha();
+				localStorage.setItem("Em_Atendimento", JSON.stringify(atendendo));
+					alert(`
+						Atendendo \n
+						Senha: `+ atendendo.Identificador +`\n
+						Valor: ` + atendendo.Valor + ``
+					);
 			});
 			
 		}
 
-		function FinalizarAtendimento(){
+		function FinalizarAtendimento(identificador){
 			var senha = new Queue();
 
-			firebase.database().ref("Atendendo").once('value').then(function(snapshot){
+			firebase.database().ref("Senhas").once('value').then(function(snapshot){
 
 				snapshot.forEach(function(value){
-					senha.InserirNaLista(value.val());
+					if(value.val().Status == "Em Atendimento"){
+						senha.InserirNaLista(value.val());
+					}
+			
 				});
 
-				senha.FinalizarAtendimento();
+				senha.FinalizarAtendimento(identificador);
 
 			});
+		}
+
+		function ContarSenhasNaFrente(identificadoSenha){
+			var senha = new Queue();
+
+			firebase.database().ref("Senhas").once('value').then(function(snapshot){
+
+				snapshot.forEach(function(value){
+					if(value.val().Status == "Em Fila"){
+						senha.InserirNaLista(value.val());
+					}
+			
+				});
+
+				var senhasNaFrente = senha.ContarSenhasNaFrente(identificadoSenha);
+				alert(`Possuem ` + senhasNaFrente + ` senha na sua frente`);
+
+			});
+		}
+
+		function ContarSenhasDeUmTipo(statusSenha){
+			var senha = new Queue();
+
+			firebase.database().ref("Senhas").once('value').then(function(snapshot){
+
+				snapshot.forEach(function(value){
+					if(value.val().Status == statusSenha){
+						senha.InserirNaLista(value.val());
+					}
+			
+				});
+
+				var senhasDoTipo = senha.ContarSenhasDeUmTipo(statusSenha);
+				alert(`Possuem ` + senhasDoTipo + ` senhas no status ` + statusSenha);
+
+			});
+
+			
 		}
 	</script>
 </body>

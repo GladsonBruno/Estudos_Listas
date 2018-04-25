@@ -45,32 +45,66 @@ function Queue(){
         if(this.lista.length > 0){
             var obj = this.lista[0];
             this.lista.splice(0,1);
-            firebase.database().ref('Senhas/' + obj.Criacao).remove();
             obj.Status = "Em Atendimento";
-            firebase.database().ref('Atendendo/' + obj.Criacao).set(obj);
-            if(this.lista.length == 0){
-                firebase.database().ref('Senhas').set(0);    
-            }
+            firebase.database().ref('Senhas/' + obj.Criacao).set(obj);
+            console.log(obj);
             return obj;    
         }else{
             alert("Não há objetos na fila.");
-            firebase.database().ref('Senhas').set(0);
         }
     }
 
-    this.FinalizarAtendimento = function(){
+    this.FinalizarAtendimento = function(identificador){
         if(this.lista.length > 0){
-            var obj = this.lista[0];
-            this.lista.splice(0,1);
-            firebase.database().ref('Atendendo/' + obj.Criacao).remove();
-            obj.Status = "Atendimento Finalizado";
-            firebase.database().ref('Atendidas/' + obj.Criacao).set(obj);
-            if(this.lista.length == 0){
-                firebase.database().ref('Atendendo').set(0);    
+            for(i = 0; i < this.lista.length; i++){
+                if(this.lista[i].Identificador == identificador){
+                    var obj = this.lista[i];
+                    this.lista.splice(i,1);
+                }
             }
+            
+
+            Atendendo.Status = "Atendimento Finalizado";
+            firebase.database().ref('Senhas/' + Atendendo.Criacao).set(Atendendo);
         }else{
             alert("Não há objetos na fila.");
-            firebase.database().ref('Atendendo').set(0);
+        }
+    }
+
+    this.ContarSenhasNaFrente = function(identificadorConsulta){
+        var SenhasNaFrente = 0;
+        var idSenha;
+        if(this.lista.length > 0){
+            for(i = 0; i < this.lista.length; i++){
+                if(this.lista[i].Identificador == identificadorConsulta){
+                    idSenha = this.lista[i].Criacao;
+                    console.log(idSenha);
+                }
+            }
+
+            for(i = 0; i < this.lista.length; i++){
+                if(this.lista[i].Criacao < idSenha){
+                    SenhasNaFrente++;
+                }
+            }
+
+            return SenhasNaFrente;
+        } else {
+            alert("Não há senhas na fila");
+        }
+    }
+
+    this.ContarSenhasDeUmTipo = function(statusSenha){
+        var senhas = 0;
+        if(this.lista.length > 0){
+            for(i = 0; i < this.lista.length; i++){
+                if(this.lista[i].Status == statusSenha){
+                    senhas++;
+                }
+            }
+            return senhas;
+        } else {
+            alert("Não há senhas na fila");
         }
     }
  
