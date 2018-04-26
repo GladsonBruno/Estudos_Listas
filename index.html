@@ -35,21 +35,26 @@
 			var obj = {
 				"Criacao": "",
 				"Identificador": "",
+				"Tipo": "",
 				"Status": "Em Fila",
 				"Valor": ""
 			}
 
 			switch(tipo){
 				case 1: obj.Identificador = "PFF";
+						obj.Tipo = "PFF";
 						obj.Valor = "R$10.00";
 						break;
 				case 2: obj.Identificador = "BFF";
+						obj.Tipo = "BFF";
 						obj.Valor = "R$5.00";
 						break;
 				case 3: obj.Identificador = "CFF";
+						obj.Tipo = "CFF";
 						obj.Valor = "Gratuito";
 						break;
 				case 4: obj.Identificador = "AFF";
+						obj.Tipo = "AFF";
 						obj.Valor = "Gratuito";
 						break;
 			};
@@ -136,16 +141,29 @@
 			});
 		}
 
-		function ContarSenhasDeUmTipo(statusSenha){
+		function ContarSenhasEmUmStatus(statusSenha){
 			var senha = new Queue();
 
 			firebase.database().ref("Senhas").once('value').then(function(snapshot){
 
 				snapshot.forEach(function(value){
-					if(value.val().Status == statusSenha){
 						senha.InserirNaLista(value.val());
-					}
-			
+				});
+
+				var senhasStatus = senha.ContarSenhasEmUmStatus(statusSenha);
+				alert(`Possuem ` + senhasStatus + ` senhas no status ` + statusSenha);
+
+			});
+
+		}
+
+		function ContarSenhasDeUmTipo(tipoSenha){
+			var senha = new Queue();
+
+			firebase.database().ref("Senhas").once('value').then(function(snapshot){
+
+				snapshot.forEach(function(value){
+						senha.InserirNaLista(value.val());
 				});
 
 				var senhasDoTipo = senha.ContarSenhasDeUmTipo(statusSenha);
@@ -153,7 +171,6 @@
 
 			});
 
-			
 		}
 	</script>
 </body>

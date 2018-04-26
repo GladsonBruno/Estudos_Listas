@@ -56,16 +56,21 @@ function Queue(){
 
     this.FinalizarAtendimento = function(identificador){
         if(this.lista.length > 0){
+            var obj;
             for(i = 0; i < this.lista.length; i++){
                 if(this.lista[i].Identificador == identificador){
-                    var obj = this.lista[i];
+                    obj = this.lista[i];
                     this.lista.splice(i,1);
                 }
             }
             
+            if(obj != null || obj != undefined){
+                obj.Status = "Atendimento Finalizado";
+                firebase.database().ref('Senhas/' + obj.Criacao).set(obj);
+            } else {
+                alert("Digite uma senha Válida");
+            }
 
-            Atendendo.Status = "Atendimento Finalizado";
-            firebase.database().ref('Senhas/' + Atendendo.Criacao).set(Atendendo);
         }else{
             alert("Não há objetos na fila.");
         }
@@ -94,11 +99,25 @@ function Queue(){
         }
     }
 
-    this.ContarSenhasDeUmTipo = function(statusSenha){
+    this.ContarSenhasEmUmStatus = function(statusSenha){
         var senhas = 0;
         if(this.lista.length > 0){
             for(i = 0; i < this.lista.length; i++){
                 if(this.lista[i].Status == statusSenha){
+                    senhas++;
+                }
+            }
+            return senhas;
+        } else {
+            alert("Não há senhas na fila");
+        }
+    }
+
+    this.ContarSenhasDeUmTipo = function(TipoSenha){
+        var senhas = 0;
+        if(this.lista.length > 0){
+            for(i = 0; i < this.lista.length; i++){
+                if(this.lista[i].Tipo == statusSenha){
                     senhas++;
                 }
             }
